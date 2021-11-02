@@ -1,11 +1,11 @@
 {
   "name": "uniswap-quoter",
   "scripts": {
-    "chain": "hardhat node --no-deploy --network hardhat",
-    "fork": "hardhat node --network hardhat --no-deploy --fork https://eth-mainnet.alchemyapi.io/v2/XLbyCEcaLhQ3x_ZaKBmZqNp8UGgNGX2F",
+    "chain": "hardhat node --network hardhat --no-deploy",
+    "fork": "hardhat node --no-deploy --network hardhat --fork https://eth-mainnet.alchemyapi.io/v2/XLbyCEcaLhQ3x_ZaKBmZqNp8UGgNGX2F",
     "test": "hardhat test --network hardhat",
     "compile": "hardhat compile",
-    "deploy": "npx hardhat deploy --export-all frontend/src/abi/contracts.json"
+    "deploy": "hardhat deploy --export-all frontend/src/abi/contracts.json"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -19,6 +19,7 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.5.1",
     "hardhat": "^2.6.7",
+    "hardhat-contract-sizer": "^2.1.1",
     "hardhat-deploy": "^0.9.4",
     "hardhat-gas-reporter": "^1.0.4"
   }

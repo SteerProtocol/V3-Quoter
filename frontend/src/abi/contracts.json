@@ -1,11 +1,11 @@
 {
   "31337": {
-    "hardhat": {
-      "name": "hardhat",
+    "localhost": {
+      "name": "localhost",
       "chainId": "31337",
       "contracts": {
         "Quoter": {
-          "address": "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f",
+          "address": "0xCD8a1C3ba11CF5ECfa6267617243239504a98d90",
           "abi": [
             {
               "inputs": [

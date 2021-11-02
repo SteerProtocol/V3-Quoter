@@ -76,7 +76,7 @@ function App() {
       res = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount);
     }
 
-    console.log(res);
+    setQuote(res);
 
     setLoading(false);
   };
@@ -140,7 +140,7 @@ function App() {
         }
         { quote > 0 &&
           <div className="alert alert-primary" role="alert">
-            You would receive {quote} tokens
+            You would receive {quote.toString()} tokens
           </div>
         }
         <p className="mt-5 mb-3 text-muted">Made for Unicode Hack</p>

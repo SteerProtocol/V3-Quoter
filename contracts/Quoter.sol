@@ -32,20 +32,20 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) public view override returns (uint256, uint256) {
+    ) public view override returns (uint256) {
         (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
 
-        return (_estimateOutputSingle(_toToken, _fromToken, _amount, pool), poolFee);
+        return _estimateOutputSingle(_toToken, _fromToken, _amount, pool);
     }
 
     function estimateMinSwapUniswapV3(
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) public view override returns (uint256, uint256) {
+    ) public view override returns (uint256) {
         (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
 
-        return (_estimateInputSingle(_toToken, _fromToken, _amount, pool), poolFee);
+        return _estimateInputSingle(_toToken, _fromToken, _amount, pool);
     }
 
     function _estimateOutputSingle(
