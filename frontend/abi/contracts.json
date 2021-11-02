@@ -1,0 +1,94 @@
+{
+  "31337": {
+    "hardhat": {
+      "name": "hardhat",
+      "chainId": "31337",
+      "contracts": {
+        "Quoter": {
+          "address": "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_uniV3Factory",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_fromToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "_estimateMaxSwapUniswapV3",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_fromToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "_estimateMinSwapUniswapV3",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

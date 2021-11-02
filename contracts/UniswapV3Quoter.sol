@@ -71,12 +71,12 @@ contract UniswapV3Quoter is IUniswapV3Quoter {
         sqrtPriceNextX96 = TickMath.getSqrtRatioAtTick(tickNext);
     }
 
-function quoteSwap(
+    function quoteSwap(
             address poolAddress,
             int256 amountSpecified,
             uint160 sqrtPriceLimitX96,
             bool zeroForOne
-        ) internal view returns (int256 amount0, int256 amount1) {
+    ) internal view returns (int256 amount0, int256 amount1) {
         require(amountSpecified < 0, 'AS');
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
 
@@ -125,13 +125,13 @@ function quoteSwap(
             }
         }
 
-    (amount0, amount1) = 
-        zeroForOne
+        (amount0, amount1) = 
+            zeroForOne
             ?(state.amountCalculated, amountSpecified - state.amountSpecifiedRemaining)
             :(amountSpecified - state.amountSpecifiedRemaining, state.amountCalculated);
-}
+    }
 
-function quoteSwapExactAmount(
+    function quoteSwapExactAmount(
             address poolAddress,
             int256 amountSpecified,
             uint160 sqrtPriceLimitX96,
@@ -189,6 +189,6 @@ function quoteSwapExactAmount(
       (amount0, amount1) = zeroForOne
             ? (amountSpecified - state.amountSpecifiedRemaining, state.amountCalculated)
             : (state.amountCalculated, amountSpecified - state.amountSpecifiedRemaining);
-}
+    }
 
 }

@@ -2,7 +2,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-import './UniswapV3Quoter.sol';
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -10,15 +9,16 @@ import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolImmutables.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "./interfaces/IUniswapV3.sol";
+import "./interfaces/IQuoter.sol";
 import "./interfaces/IUniswapV3Quoter.sol";
 import "./libraries/FullMath.sol";
 import "./libraries/SafeCast.sol";
 import "./libraries/TickBitmap.sol";
 import "./libraries/SqrtPriceMath.sol";
+import './UniswapV3Quoter.sol';
 import "hardhat/console.sol";
 
-contract UniswapV3 is IUniswapV3, UniswapV3Quoter {
+contract Quoter is IQuoter, UniswapV3Quoter {
     using SafeERC20 for IERC20;
     using SafeCast for uint256;
 
@@ -32,20 +32,20 @@ contract UniswapV3 is IUniswapV3, UniswapV3Quoter {
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) public view override returns (uint256) {
+    ) public view override returns (uint256, uint256) {
         (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
 
-        return _estimateOutputSingle(_toToken, _fromToken, _amount, pool);
+        return (_estimateOutputSingle(_toToken, _fromToken, _amount, pool), poolFee);
     }
 
     function _estimateMinSwapUniswapV3(
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) public view override returns (uint256) {
+    ) public view override returns (uint256, uint256) {
         (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
 
-        return _estimateInputSingle(_toToken, _fromToken, _amount, pool);
+        return (_estimateInputSingle(_toToken, _fromToken, _amount, pool), poolFee);
     }
 
     function _estimateOutputSingle(
@@ -62,7 +62,6 @@ contract UniswapV3 is IUniswapV3, UniswapV3Quoter {
             amountOut = amount1 > 0 ? uint256(amount1) : uint256(-amount1);
         else amountOut = amount0 > 0 ? uint256(amount0) : uint256(-amount0);
     }
-
 
     function _estimateInputSingle(
         address _fromToken,
