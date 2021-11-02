@@ -24,7 +24,7 @@ contract UniswapV3Quoter is IUniswapV3Quoter {
     using Tick for mapping(int24 => Tick.Info);
     using TickBitmap for uint256;
 
-    function _fetchState(address _pool) internal view returns (
+    function fetchState(address _pool) internal view returns (
         PoolState memory poolState
         ){
         IUniswapV3Pool pool = IUniswapV3Pool(_pool);
@@ -35,7 +35,7 @@ contract UniswapV3Quoter is IUniswapV3Quoter {
         poolState = PoolState(sqrtPriceX96, tick, tickSpacing, fee, liquidity, unlocked);
     }
 
-    function _setInitialState(PoolState memory poolStateStart, int256 amountSpecified) 
+    function setInitialState(PoolState memory poolStateStart, int256 amountSpecified) 
         internal pure returns (SwapState memory state) {
         state =
             SwapState({
@@ -80,7 +80,7 @@ function quoteSwap(
         require(amountSpecified < 0, 'AS');
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
 
-        PoolState memory initialPoolState = _fetchState(poolAddress);
+        PoolState memory initialPoolState = fetchState(poolAddress);
 
         uint128 liquidity = initialPoolState.liquidity;
         
@@ -91,7 +91,7 @@ function quoteSwap(
                 ? sqrtPriceLimitX96 < initialPoolState.sqrtPriceX96 && sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO
                 : sqrtPriceLimitX96 > initialPoolState.sqrtPriceX96 && sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO, 'SPL');
 
-        SwapState memory state = _setInitialState(initialPoolState, amountSpecified);
+        SwapState memory state = setInitialState(initialPoolState, amountSpecified);
 
         while (state.amountSpecifiedRemaining != 0 && sqrtPriceX96 != sqrtPriceLimitX96) {
             StepComputations memory step;
@@ -141,7 +141,7 @@ function quoteSwapExactAmount(
 
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
 
-        PoolState memory initialPoolState = _fetchState(poolAddress);
+        PoolState memory initialPoolState = fetchState(poolAddress);
         
         uint128 liquidity = initialPoolState.liquidity;
 
@@ -152,7 +152,7 @@ function quoteSwapExactAmount(
                 ? sqrtPriceLimitX96 < initialPoolState.sqrtPriceX96 && sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO
                 : sqrtPriceLimitX96 > initialPoolState.sqrtPriceX96 && sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO, 'SPL');
 
-        SwapState memory state = _setInitialState(initialPoolState, amountSpecified);
+        SwapState memory state = setInitialState(initialPoolState, amountSpecified);
 
         while (state.amountSpecifiedRemaining != 0 && sqrtPriceX96 != sqrtPriceLimitX96) {
             StepComputations memory step;

@@ -12,16 +12,13 @@ import "@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolImmutables.sol"
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "./interfaces/IUniswapV3.sol";
 import "./interfaces/IUniswapV3Quoter.sol";
-import "./libraries/UniswapV3/FullMath.sol";
-import "./libraries/UniswapV3/SafeCast.sol";
-import "./libraries/UniswapV3Math.sol";
-import "./libraries/UniswapPath.sol";
-import "./libraries/UniswapV3/TickBitmap.sol";
-import "./libraries/UniswapV3/SqrtPriceMath.sol";
+import "./libraries/FullMath.sol";
+import "./libraries/SafeCast.sol";
+import "./libraries/TickBitmap.sol";
+import "./libraries/SqrtPriceMath.sol";
 import "hardhat/console.sol";
 
 contract UniswapV3 is IUniswapV3, UniswapV3Quoter {
-    using UniswapPath for bytes;
     using SafeERC20 for IERC20;
     using SafeCast for uint256;
 
@@ -41,40 +38,6 @@ contract UniswapV3 is IUniswapV3, UniswapV3Quoter {
         return _estimateOutputSingle(_toToken, _fromToken, _amount, pool);
     }
 
-    function uniswapV3SwapCallback(
-        int256 amount0Delta,
-        int256 amount1Delta,
-        bytes calldata _data
-    ) external {
-        SwapCallbackData memory data = abi.decode(_data, (SwapCallbackData));
-        (address tokenIn, address tokenOut, uint24 fee) = data
-            .path
-            .decodeFirstPool();
-
-        address pool = uniV3Factory.getPool(tokenIn, tokenOut, fee);
-        require(msg.sender == pool);
-
-        (bool isExactInput, uint256 amountToPay) = amount0Delta > 0
-            ? (tokenIn < tokenOut, uint256(amount0Delta))
-            : (tokenOut < tokenIn, uint256(amount1Delta));
-
-        if (isExactInput) {
-            IERC20(tokenIn).safeTransferFrom(
-                data.payer,
-                msg.sender,
-                amountToPay
-            );
-        } else {
-            // either initiate the next swap or pay
-            // swap in/out because exact output swaps are reversed
-            IERC20(tokenOut).safeTransferFrom(
-                data.payer,
-                msg.sender,
-                amountToPay
-            );
-        }
-    }
-
     function _estimateMinSwapUniswapV3(
         address _fromToken,
         address _toToken,
@@ -83,76 +46,6 @@ contract UniswapV3 is IUniswapV3, UniswapV3Quoter {
         (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
 
         return _estimateInputSingle(_toToken, _fromToken, _amount, pool);
-    }
-
-    // wrapper for Uniswap exactInputSingle
-    function _maxSwapUniswapV3(
-        address _fromToken,
-        address _toToken,
-        uint256 _amount,
-        uint24 _slippage,
-        address _recipient
-    ) public override returns (uint256) {
-        // require(block.timestamp <= deadline, 'Transaction too old'); // @todo fixme
-
-        (address pool, uint24 fee) = getCheapestPool(_fromToken, _toToken);
-        uint160 sqrtPriceLimitX96 = 0; // @todo fixme
-        SwapCallbackData memory data = SwapCallbackData({
-            path: abi.encodePacked(_fromToken, fee, _toToken),
-            payer: msg.sender
-        });
-
-        bool zeroForOne = _fromToken < _toToken;
-        (int256 amount0, int256 amount1) = IUniswapV3Pool(pool).swap(
-            _recipient,
-            zeroForOne,
-            _amount.toInt256(),
-            sqrtPriceLimitX96 == 0
-                ? (
-                    zeroForOne
-                        ? TickMath.MIN_SQRT_RATIO + 1
-                        : TickMath.MAX_SQRT_RATIO - 1
-                )
-                : sqrtPriceLimitX96,
-            abi.encode(data)
-        );
-
-        uint256 amountOut = uint256(-(zeroForOne ? amount1 : amount0));
-        return amountOut;
-    }
-
-    function _minSwapUniswapV3(
-        address _fromToken,
-        address _toToken,
-        uint256 _amount,
-        uint24 _slippage,
-        address _recipient
-    ) public override returns (uint256) {
-        // require(block.timestamp <= deadline, 'Transaction too old'); // @todo fixme
-
-        (address pool, uint24 fee) = getCheapestPool(_toToken, _fromToken);
-        uint160 sqrtPriceLimitX96 = 0; // @todo fixme
-        SwapCallbackData memory data = SwapCallbackData({
-            path: abi.encodePacked(_fromToken, fee, _toToken),
-            payer: msg.sender
-        });
-
-        bool zeroForOne = _toToken < _fromToken;
-        (int256 amount0Delta, int256 amount1Delta) = IUniswapV3Pool(pool).swap(
-            _recipient,
-            zeroForOne,
-            -_amount.toInt256(),
-            sqrtPriceLimitX96 == 0
-                ? (
-                    zeroForOne
-                        ? TickMath.MIN_SQRT_RATIO + 1
-                        : TickMath.MAX_SQRT_RATIO - 1
-                )
-                : sqrtPriceLimitX96,
-            abi.encode(data)
-        );
-
-        return uint256(_toToken < _fromToken ? amount0Delta : amount1Delta);
     }
 
     function _estimateOutputSingle(
@@ -205,5 +98,4 @@ contract UniswapV3 is IUniswapV3, UniswapV3Quoter {
         if (pool != address(0)) return (pool, 10000);
         else revert("Uniswap pool does not exist");
     }
-
 }
