@@ -5,7 +5,7 @@
     "fork": "hardhat node --network hardhat --no-deploy --fork https://eth-mainnet.alchemyapi.io/v2/XLbyCEcaLhQ3x_ZaKBmZqNp8UGgNGX2F",
     "test": "hardhat test --network hardhat",
     "compile": "hardhat compile",
-    "deploy": "npx hardhat deploy --export-all frontend/abi/contracts.json"
+    "deploy": "npx hardhat deploy --export-all frontend/src/abi/contracts.json"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

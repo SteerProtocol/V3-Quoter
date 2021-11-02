@@ -28,7 +28,7 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         uniV3Factory = IUniswapV3Factory(_uniV3Factory);
     }
 
-    function _estimateMaxSwapUniswapV3(
+    function estimateMaxSwapUniswapV3(
         address _fromToken,
         address _toToken,
         uint256 _amount
@@ -38,7 +38,7 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         return (_estimateOutputSingle(_toToken, _fromToken, _amount, pool), poolFee);
     }
 
-    function _estimateMinSwapUniswapV3(
+    function estimateMinSwapUniswapV3(
         address _fromToken,
         address _toToken,
         uint256 _amount

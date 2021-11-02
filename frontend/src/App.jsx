@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { useContractLoader, useUserProviderAndSigner } from "eth-hooks";
+import useWeb3Modal from "./hooks/useWeb3Modal";
+import useContractConfig from "./hooks/useContractConfig";
+import useTokenList from "./hooks/useTokenList";
 import './App.css';
 
+/*
 const tokens = [
   {
     symbol: "WETH",
@@ -32,6 +37,7 @@ const tokens = [
     address: "0xA0A5aD2296b38Bd3e3Eb59AAEAF1589E8d9a29A9"
   }
 ];
+*/
 
 function App() {
   const [ buyFlag, setBuyFlag ] = useState(false);
@@ -40,10 +46,39 @@ function App() {
   const [ loading, setLoading ] = useState(false);
   const [ sourceToken, setSourceToken ] = useState();
   const [ destToken, setDestToken ] = useState();
+  const tokens = useTokenList();
+
+  const [ provider, account, loadWeb3Modal, logoutOfWeb3Modal ] = useWeb3Modal();
+  const chainId = 31337;
+  const config = useContractConfig();
+  const providerAndSigner = useUserProviderAndSigner(provider)
+  const contracts = useContractLoader(providerAndSigner.signer, config, chainId);
+
+  useEffect(() => {
+    loadWeb3Modal()
+  }, []);
 
   const getQuote = async () => {
+    if(amount <= 0) {
+      alert("Amount cannot be 0 or negative");
+
+      return;
+    }
+    
+    setLoading(true);
+    
     const formattedAmount = ethers.utils.parseEther(amount);
-    console.log(formattedAmount)
+
+    let res = 0;
+    if(buyFlag) {
+      res = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
+    } else {
+      res = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount);
+    }
+
+    console.log(res);
+
+    setLoading(false);
   };
 
   return (
@@ -62,8 +97,8 @@ function App() {
         <div className="form-floating">
           <select className="form-select" id="floatingSourceToken" onChange={(e) => setSourceToken(e.target.value)}>
             <option>Choose...</option>
-            { tokens.filter(token => token.address !== destToken).map((token, idx) => 
-              <option value={token.address} key={idx}>{token.symbol}</option>
+            { tokens.filter((token) => { return token.address !== destToken && token.chainId === 1}).map((token, idx) => 
+              <option value={token.address} key={idx}>{token.symbol} - {token.name}</option>
             )}
           </select>
           <label htmlFor="floatingSourceToken">Source Token</label>
@@ -71,8 +106,8 @@ function App() {
         <div className="form-floating">
           <select className="form-select" id="floatingDestToken" onChange={(e) => setDestToken(e.target.value)}>
           <option>Choose...</option>
-            { tokens.filter(token => token.address !== sourceToken).map((token, idx) => 
-              <option value={token.address} key={idx}>{token.symbol}</option>
+            { tokens.filter((token) => { return token.address !== destToken && token.chainId === 1}).map((token, idx) => 
+              <option value={token.address} key={idx}>{token.symbol} - {token.name}</option>
             )}
           </select>
           <label htmlFor="floatingDestToken">Destination Token</label>
