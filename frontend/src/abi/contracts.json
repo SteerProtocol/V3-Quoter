@@ -42,11 +42,6 @@
                   "internalType": "uint256",
                   "name": "",
                   "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -72,11 +67,6 @@
               ],
               "name": "estimateMinSwapUniswapV3",
               "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                },
                 {
                   "internalType": "uint256",
                   "name": "",
