@@ -96,8 +96,15 @@ function App() {
         let expectedAmount = 0;
         let poolFee = 0;
         let expectedAmountUniswap = 0;
+        let poolFees = [500, 3000, 10000];
         if(!buyFlag) {
-          [expectedAmount, poolFee] = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
+          for(const fee of poolFees){
+            let putativeAmount = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
+            if (putativeAmount > expectedAmount) {
+              expectedAmount = putativeAmount;
+              poolFee = fee;
+            }
+          }
           expectedAmountUniswap = await uniswap.callStatic.quoteExactInputSingle(
             sourceToken,
             destToken,
@@ -106,7 +113,13 @@ function App() {
             0
           );
         } else {
-          [expectedAmount, poolFee] = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
+          for(const fee of poolFees){
+            let putativeAmount = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
+            if (putativeAmount > expectedAmount) {
+              expectedAmount = putativeAmount;
+              poolFee = fee;
+            }
+          }
           expectedAmountUniswap = await uniswap.callStatic.quoteExactOutputSingle(
             sourceToken,
             destToken,

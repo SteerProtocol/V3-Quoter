@@ -31,21 +31,23 @@ contract Quoter is IQuoter, UniswapV3Quoter {
     function estimateMaxSwapUniswapV3(
         address _fromToken,
         address _toToken,
-        uint256 _amount
-    ) public view override returns (uint256, uint24) {
-        (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
+        uint256 _amount,
+        uint24 _poolFee
+    ) public view override returns (uint256) {
+        address pool = uniV3Factory.getPool(_fromToken, _toToken, _poolFee);
 
-        return (_estimateOutputSingle(_toToken, _fromToken, _amount, pool), poolFee);
+        return _estimateOutputSingle(_toToken, _fromToken, _amount, pool);
     }
 
     function estimateMinSwapUniswapV3(
         address _fromToken,
         address _toToken,
-        uint256 _amount
-    ) public view override returns (uint256, uint24) {
-        (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
+        uint256 _amount,
+        uint24 _poolFee
+    ) public view override returns (uint256) {
+        address pool = uniV3Factory.getPool(_fromToken, _toToken, _poolFee);
 
-        return (_estimateInputSingle(_toToken, _fromToken, _amount, pool), poolFee);
+        return _estimateInputSingle(_toToken, _fromToken, _amount, pool);
     }
 
     function _estimateOutputSingle(
@@ -96,40 +98,5 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         pool = uniV3Factory.getPool(_token0, _token1, 10000);
         if (pool != address(0)) return true;
         else return false;
-    }
-
-    // @todo To be replaced
-    function getCheapestPool(address _token0, address _token1)
-        internal
-        view
-        returns (address bestPool, uint24 poolFee)
-    {
-        uint128 liquidity;
-        // try 0.05%
-        address pool = uniV3Factory.getPool(_token0, _token1, 500);
-        IUniswapV3Pool poolInterface = IUniswapV3Pool(pool);
-        if (pool != address(0)) {
-            liquidity = poolInterface.liquidity();
-            bestPool = pool;
-            poolFee = 500;
-        }
-        // try 0.3%
-        pool = uniV3Factory.getPool(_token0, _token1, 3000);
-        poolInterface = IUniswapV3Pool(pool);
-        if (pool != address(0) && liquidity <= poolInterface.liquidity()) {
-            liquidity = poolInterface.liquidity();
-            bestPool = pool;
-            poolFee = 3000;
-        }
-
-        // try 1%
-        pool = uniV3Factory.getPool(_token0, _token1, 10000);
-        poolInterface = IUniswapV3Pool(pool);
-        if (pool != address(0) && liquidity <= poolInterface.liquidity()){
-            liquidity = poolInterface.liquidity();
-            bestPool = pool;
-            poolFee = 10000;
-        }
-        if(bestPool == address(0)) revert("Uniswap pool does not exist");
     }
 }
