@@ -68,7 +68,7 @@ function App() {
     const formattedAmount = ethers.utils.parseEther(amount);
 
     let res = 0;
-    if(buyFlag) {
+    if(!buyFlag) {
       res = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
     } else {
       res = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount);
