@@ -38,6 +38,7 @@ const tokens = [
 ];
 
 function App() {
+  const [ err, setErr ] = useState("");
   const [ buyFlag, setBuyFlag ] = useState(false);
   const [ amount, setAmount ] = useState(0.0);
   const [ quote, setQuote ] = useState(0);
@@ -56,25 +57,50 @@ function App() {
     loadWeb3Modal()
   }, []);
 
+  const setErrorAlert = (text) => {
+    setErr(text);
+    setTimeout(() => {
+      setErr("");
+   }, 3500)
+  }
+
+  const setQuoteAlert = (text) => {
+    setQuote(text);
+    setTimeout(() => {
+      setQuote("");
+   }, 3500)
+  }
+
   const getQuote = async () => {
     if(amount <= 0) {
-      alert("Amount cannot be 0 or negative");
+      setErrorAlert("Amount cannot be 0 or negative");
 
       return;
     }
-    
+
     setLoading(true);
-    
-    const formattedAmount = ethers.utils.parseEther(amount);
 
-    let res = 0;
-    if(!buyFlag) {
-      res = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
-    } else {
-      res = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
+    try {
+
+      const exists = await contracts.Quoter.doesPoolExist(sourceToken, destToken);
+      if(!exists) {
+        setErrorAlert("Pool does not exist");
+      } else {
+        const formattedAmount = ethers.utils.parseEther(amount);
+
+        let res = 0;
+        if(!buyFlag) {
+          res = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
+        } else {
+          res = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
+        }
+
+        setQuoteAlert(res);
+      }
+
+    } catch(e) {
+      setErrorAlert("MetaMask Provider Error");
     }
-
-    setQuote(res);
 
     setLoading(false);
   };
@@ -140,6 +166,9 @@ function App() {
           <div className="alert alert-primary" role="alert">
             You would {buyFlag ? "give" : "receive"} {ethers.utils.formatUnits(quote, 18)} tokens
           </div>
+        }
+        { err != "" &&
+          <div className="alert alert-danger" role="alert">{err}</div>
         }
         <p className="mt-5 mb-3 text-muted">Made for Unicode Hack</p>
       </form>
