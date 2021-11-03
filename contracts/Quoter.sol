@@ -78,6 +78,26 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         else amountOut = amount1 > 0 ? uint256(amount1) : uint256(-amount1);
     }    
 
+
+    function doesPoolExist(address _token0, address _token1)
+        external
+        view
+        returns (bool)
+    {
+        // try 0.05%
+        address pool = uniV3Factory.getPool(_token0, _token1, 500);
+        if (pool != address(0)) return true;
+
+        // try 0.3%
+        pool = uniV3Factory.getPool(_token0, _token1, 3000);
+        if (pool != address(0)) return true;
+
+        // try 1%
+        pool = uniV3Factory.getPool(_token0, _token1, 10000);
+        if (pool != address(0)) return true;
+        else return false;
+    }
+
     // @todo To be replaced
     function getCheapestPool(address _token0, address _token1)
         internal
