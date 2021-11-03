@@ -102,19 +102,32 @@ contract Quoter is IQuoter, UniswapV3Quoter {
     function getCheapestPool(address _token0, address _token1)
         internal
         view
-        returns (address, uint24)
+        returns (address bestPool, uint24 poolFee)
     {
+        uint256 balance;
+        IERC20 token = IERC20(_token0);
         // try 0.05%
         address pool = uniV3Factory.getPool(_token0, _token1, 500);
-        if (pool != address(0)) return (pool, 500);
-
+        if (pool != address(0)) {
+            balance = token.balanceOf(pool);
+            bestPool = pool;
+            poolFee = 500;
+        }
         // try 0.3%
         pool = uniV3Factory.getPool(_token0, _token1, 3000);
-        if (pool != address(0)) return (pool, 3000);
+        if (pool != address(0) && balance <= token.balanceOf(pool)) {
+            balance = token.balanceOf(pool);
+            bestPool = pool;
+            poolFee = 3000;
+        }
 
         // try 1%
         pool = uniV3Factory.getPool(_token0, _token1, 10000);
-        if (pool != address(0)) return (pool, 10000);
-        else revert("Uniswap pool does not exist");
+        if (pool != address(0) && balance <= token.balanceOf(pool)){
+            balance = token.balanceOf(pool);
+            bestPool = pool;
+            poolFee = 3000;
+        }
+        if(bestPool == address(0)) revert("Uniswap pool does not exist");
     }
 }
