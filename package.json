@@ -1,5 +1,8 @@
 {
   "name": "uniswap-quoter",
+  "version": "1.0.0",
+  "private": false,
+  "license": "BUSL-1.1",
   "scripts": {
     "chain": "hardhat node --network hardhat --no-deploy",
     "fork": "hardhat node --no-deploy --network hardhat --fork https://eth-mainnet.alchemyapi.io/v2/XLbyCEcaLhQ3x_ZaKBmZqNp8UGgNGX2F",

@@ -6,6 +6,10 @@ import useContractConfig from "./hooks/useContractConfig";
 import useTokenList from "./hooks/useTokenList";
 import './App.css';
 
+const {
+  abi,
+} = require("@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json");
+
 const tokens = [
   {
     symbol: "WETH",
@@ -41,7 +45,7 @@ function App() {
   const [ err, setErr ] = useState("");
   const [ buyFlag, setBuyFlag ] = useState(false);
   const [ amount, setAmount ] = useState(0.0);
-  const [ quote, setQuote ] = useState(0);
+  const [ quote, setQuote ] = useState("");
   const [ loading, setLoading ] = useState(false);
   const [ sourceToken, setSourceToken ] = useState();
   const [ destToken, setDestToken ] = useState();
@@ -61,14 +65,14 @@ function App() {
     setErr(text);
     setTimeout(() => {
       setErr("");
-   }, 3500)
+   }, 5000);
   }
 
   const setQuoteAlert = (text) => {
     setQuote(text);
     setTimeout(() => {
       setQuote("");
-   }, 3500)
+   }, 10000);
   }
 
   const getQuote = async () => {
@@ -87,18 +91,36 @@ function App() {
         setErrorAlert("Pool does not exist");
       } else {
         const formattedAmount = ethers.utils.parseEther(amount);
+        const uniswap = new ethers.Contract("0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6", abi, provider);
 
-        let res = 0;
+        let expectedAmount = 0;
+        let expectedAmountUniswap = 0;
         if(!buyFlag) {
-          res = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
+          expectedAmount = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
+          expectedAmountUniswap = await uniswap.callStatic.quoteExactInputSingle(
+            sourceToken,
+            destToken,
+            3000,
+            formattedAmount,
+            0
+          );
         } else {
-          res = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
+          expectedAmount = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
+          expectedAmountUniswap = await uniswap.callStatic.quoteExactOutputSingle(
+            sourceToken,
+            destToken,
+            3000,
+            formattedAmount,
+            0
+          );
         }
 
-        setQuoteAlert(res);
+        const text = `You would ${buyFlag ? "give" : "receive"} ${ethers.utils.formatUnits(expectedAmount, 18)} tokens. Uniswap lens quoter returned ${ethers.utils.formatUnits(expectedAmountUniswap, 18)} tokens.`;
+        setQuoteAlert(text);
       }
 
     } catch(e) {
+      console.log(e);
       setErrorAlert("MetaMask Provider Error");
     }
 
@@ -162,13 +184,11 @@ function App() {
             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Loading...
           </button>
         }
-        { quote > 0 &&
-          <div className="alert alert-primary" role="alert">
-            You would {buyFlag ? "give" : "receive"} {ethers.utils.formatUnits(quote, 18)} tokens
-          </div>
+        { quote !== "" &&
+          <div className="alert alert-primary text-wrap" role="alert">{quote}</div>
         }
-        { err != "" &&
-          <div className="alert alert-danger" role="alert">{err}</div>
+        { err !== "" &&
+          <div className="alert alert-danger text-wrap" role="alert">{err}</div>
         }
         <p className="mt-5 mb-3 text-muted">Made for Unicode Hack</p>
       </form>
