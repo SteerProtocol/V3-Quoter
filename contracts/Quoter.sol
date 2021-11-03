@@ -104,27 +104,29 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         view
         returns (address bestPool, uint24 poolFee)
     {
-        uint256 balance;
-        IERC20 token = IERC20(_token0);
+        uint128 liquidity;
         // try 0.05%
         address pool = uniV3Factory.getPool(_token0, _token1, 500);
+        IUniswapV3Pool poolInterface = IUniswapV3Pool(pool);
         if (pool != address(0)) {
-            balance = token.balanceOf(pool);
+            liquidity = poolInterface.liquidity();
             bestPool = pool;
             poolFee = 500;
         }
         // try 0.3%
         pool = uniV3Factory.getPool(_token0, _token1, 3000);
-        if (pool != address(0) && balance <= token.balanceOf(pool)) {
-            balance = token.balanceOf(pool);
+        poolInterface = IUniswapV3Pool(pool);
+        if (pool != address(0) && liquidity <= poolInterface.liquidity()) {
+            liquidity = poolInterface.liquidity();
             bestPool = pool;
             poolFee = 3000;
         }
 
         // try 1%
         pool = uniV3Factory.getPool(_token0, _token1, 10000);
-        if (pool != address(0) && balance <= token.balanceOf(pool)){
-            balance = token.balanceOf(pool);
+        poolInterface = IUniswapV3Pool(pool);
+        if (pool != address(0) && liquidity <= poolInterface.liquidity()){
+            liquidity = poolInterface.liquidity();
             bestPool = pool;
             poolFee = 3000;
         }
