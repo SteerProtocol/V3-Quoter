@@ -71,7 +71,7 @@ function App() {
     if(!buyFlag) {
       res = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
     } else {
-      res = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount);
+      res = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
     }
 
     setQuote(res);
@@ -138,7 +138,7 @@ function App() {
         }
         { quote > 0 &&
           <div className="alert alert-primary" role="alert">
-            You would receive {ethers.utils.formatUnits(quote, 18)} tokens
+            You would {buyFlag ? "give" : "receive"} {ethers.utils.formatUnits(quote, 18)} tokens
           </div>
         }
         <p className="mt-5 mb-3 text-muted">Made for Unicode Hack</p>
