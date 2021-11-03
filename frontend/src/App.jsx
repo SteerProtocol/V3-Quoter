@@ -94,28 +94,30 @@ function App() {
         const uniswap = new ethers.Contract("0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6", abi, provider);
 
         let expectedAmount = 0;
+        let poolFee = 0;
         let expectedAmountUniswap = 0;
         if(!buyFlag) {
-          expectedAmount = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
+          [expectedAmount, poolFee] = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount);
           expectedAmountUniswap = await uniswap.callStatic.quoteExactInputSingle(
             sourceToken,
             destToken,
-            3000,
+            poolFee,
             formattedAmount,
             0
           );
         } else {
-          expectedAmount = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
+          [expectedAmount, poolFee] = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount);
           expectedAmountUniswap = await uniswap.callStatic.quoteExactOutputSingle(
             sourceToken,
             destToken,
-            3000,
+            poolFee,
             formattedAmount,
             0
           );
         }
 
-        const text = `You would ${buyFlag ? "give" : "receive"} ${ethers.utils.formatUnits(expectedAmount, 18)} tokens. Uniswap lens quoter returned ${ethers.utils.formatUnits(expectedAmountUniswap, 18)} tokens.`;
+        const text = `You would ${buyFlag ? "give" : "receive"} ${ethers.utils.formatUnits(expectedAmount, 18)} tokens. Uniswap lens quoter returned ${ethers.utils.formatUnits(expectedAmountUniswap, 18)} tokens.
+        Pool fee is ${poolFee}`;
         setQuoteAlert(text);
       }
 

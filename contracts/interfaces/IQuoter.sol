@@ -7,11 +7,11 @@ interface IQuoter {
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) external view returns (uint256);
+    ) external view returns (uint256, uint24);
 
     function estimateMinSwapUniswapV3(
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) external view returns (uint256);
+    ) external view returns (uint256, uint24);
 }

@@ -32,20 +32,20 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) public view override returns (uint256) {
+    ) public view override returns (uint256, uint24) {
         (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
 
-        return _estimateOutputSingle(_toToken, _fromToken, _amount, pool);
+        return (_estimateOutputSingle(_toToken, _fromToken, _amount, pool), poolFee);
     }
 
     function estimateMinSwapUniswapV3(
         address _fromToken,
         address _toToken,
         uint256 _amount
-    ) public view override returns (uint256) {
+    ) public view override returns (uint256, uint24) {
         (address pool, uint24 poolFee) = getCheapestPool(_fromToken, _toToken);
 
-        return _estimateInputSingle(_toToken, _fromToken, _amount, pool);
+        return (_estimateInputSingle(_toToken, _fromToken, _amount, pool), poolFee);
     }
 
     function _estimateOutputSingle(
@@ -128,7 +128,7 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         if (pool != address(0) && liquidity <= poolInterface.liquidity()){
             liquidity = poolInterface.liquidity();
             bestPool = pool;
-            poolFee = 3000;
+            poolFee = 10000;
         }
         if(bestPool == address(0)) revert("Uniswap pool does not exist");
     }
