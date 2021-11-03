@@ -5,7 +5,7 @@
       "chainId": "31337",
       "contracts": {
         "Quoter": {
-          "address": "0xCD8a1C3ba11CF5ECfa6267617243239504a98d90",
+          "address": "0x36b58F5C1969B7b6591D752ea6F5486D069010AB",
           "abi": [
             {
               "inputs": [

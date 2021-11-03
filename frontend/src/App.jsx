@@ -6,38 +6,36 @@ import useContractConfig from "./hooks/useContractConfig";
 import useTokenList from "./hooks/useTokenList";
 import './App.css';
 
-/*
 const tokens = [
   {
     symbol: "WETH",
-    address: "0xd0A1E359811322d97991E03f863a0C30C2cF029C"
+    address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
   },
   {
     symbol: "DAI",
-    address: "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa"
-  },
-  {
-    symbol: "USDT",
-    address: "0xf3e0d7bF58c5d455D31ef1c2d5375904dF525105"
-  },
-  {
-    symbol: "UNI",
-    address: "0x9b6Ff80Ff8348852d5281de45E66B7ED36E7B8a9"
+    address: "0x6B175474E89094C44Da98b954EedeAC495271d0F"
   },
   {
     symbol: "LINK",
-    address: "0xa36085F69e2889c224210F603D836748e7dC0088"
+    address: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
   },
   {
-    symbol: "SHIBA",
-    address: "0xE9A1Ed75621D9357C753e1436Fe9EB63628bde67"
+    symbol: "UNI",
+    address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"
   },
   {
-    symbol: "WBTC",
-    address: "0xA0A5aD2296b38Bd3e3Eb59AAEAF1589E8d9a29A9"
+    symbol: "CURVE",
+    address: "0xD533a949740bb3306d119CC777fa900bA034cd52"
+  },
+  {
+    symbol: "SHIBA INU",
+    address: "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE"
+  },
+  {
+    symbol: "BNB",
+    address: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52"
   }
 ];
-*/
 
 function App() {
   const [ buyFlag, setBuyFlag ] = useState(false);
@@ -46,7 +44,7 @@ function App() {
   const [ loading, setLoading ] = useState(false);
   const [ sourceToken, setSourceToken ] = useState();
   const [ destToken, setDestToken ] = useState();
-  const tokens = useTokenList();
+  //const tokens = useTokenList();
 
   const [ provider, account, loadWeb3Modal, logoutOfWeb3Modal ] = useWeb3Modal();
   const chainId = 31337;
@@ -97,8 +95,8 @@ function App() {
         <div className="form-floating">
           <select className="form-select" id="floatingSourceToken" onChange={(e) => setSourceToken(e.target.value)}>
             <option>Choose...</option>
-            { tokens.filter((token) => { return token.address !== destToken && token.chainId === 1}).map((token, idx) => 
-              <option value={token.address} key={idx}>{token.symbol} - {token.name}</option>
+            { tokens.filter((token) => token.address !== destToken).map((token, idx) => 
+              <option value={token.address} key={idx}>{token.symbol}</option>
             )}
           </select>
           <label htmlFor="floatingSourceToken">Source Token</label>
@@ -106,8 +104,8 @@ function App() {
         <div className="form-floating">
           <select className="form-select" id="floatingDestToken" onChange={(e) => setDestToken(e.target.value)}>
           <option>Choose...</option>
-            { tokens.filter((token) => { return token.address !== destToken && token.chainId === 1}).map((token, idx) => 
-              <option value={token.address} key={idx}>{token.symbol} - {token.name}</option>
+          { tokens.filter((token) => token.address !== sourceToken).map((token, idx) => 
+              <option value={token.address} key={idx}>{token.symbol}</option>
             )}
           </select>
           <label htmlFor="floatingDestToken">Destination Token</label>
@@ -140,7 +138,7 @@ function App() {
         }
         { quote > 0 &&
           <div className="alert alert-primary" role="alert">
-            You would receive {quote.toString()} tokens
+            You would receive {ethers.utils.formatUnits(quote, 18)} tokens
           </div>
         }
         <p className="mt-5 mb-3 text-muted">Made for Unicode Hack</p>
