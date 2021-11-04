@@ -49,6 +49,7 @@ function App() {
   const [ loading, setLoading ] = useState(false);
   const [ sourceToken, setSourceToken ] = useState();
   const [ destToken, setDestToken ] = useState();
+  const [ fee, setFee ] = useState();
   //const tokens = useTokenList();
 
   const [ provider, account, loadWeb3Modal, logoutOfWeb3Modal ] = useWeb3Modal();
@@ -56,6 +57,8 @@ function App() {
   const config = useContractConfig();
   const providerAndSigner = useUserProviderAndSigner(provider)
   const contracts = useContractLoader(providerAndSigner.signer, config, chainId);
+
+  const poolFees = [500, 3000, 10000];
 
   useEffect(() => {
     loadWeb3Modal()
@@ -94,43 +97,29 @@ function App() {
         const uniswap = new ethers.Contract("0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6", abi, provider);
 
         let expectedAmount = 0;
-        let poolFee = 0;
         let expectedAmountUniswap = 0;
-        let poolFees = [500, 3000, 10000];
+        
         if(!buyFlag) {
-          for(const fee of poolFees){
-            let putativeAmount = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
-            if (putativeAmount > expectedAmount) {
-              expectedAmount = putativeAmount;
-              poolFee = fee;
-            }
-          }
+          expectedAmount = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
           expectedAmountUniswap = await uniswap.callStatic.quoteExactInputSingle(
             sourceToken,
             destToken,
-            poolFee,
+            fee,
             formattedAmount,
             0
           );
         } else {
-          for(const fee of poolFees){
-            let putativeAmount = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
-            if (putativeAmount > expectedAmount) {
-              expectedAmount = putativeAmount;
-              poolFee = fee;
-            }
-          }
+          expectedAmount = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
           expectedAmountUniswap = await uniswap.callStatic.quoteExactOutputSingle(
             sourceToken,
             destToken,
-            poolFee,
+            fee,
             formattedAmount,
             0
           );
         }
 
-        const text = `You would ${buyFlag ? "give" : "receive"} ${ethers.utils.formatUnits(expectedAmount, 18)} tokens. Uniswap lens quoter returned ${ethers.utils.formatUnits(expectedAmountUniswap, 18)} tokens.
-        Pool fee is ${poolFee}`;
+        const text = `You would ${buyFlag ? "give" : "receive"} ${ethers.utils.formatUnits(expectedAmount, 18)} tokens. Uniswap lens quoter returned ${ethers.utils.formatUnits(expectedAmountUniswap, 18)} tokens.`;
         setQuoteAlert(text);
       }
 
@@ -143,12 +132,12 @@ function App() {
   };
 
   return (
-    <main className="form-signin text-center">
+    <main className="text-center form-signin">
       <form>
         <img className="mb-4" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Uniswap_Logo.svg/1026px-Uniswap_Logo.svg.png" alt="Uniswap logo" width="72" height="72" />
-        <h1 className="h3 mb-3 fw-normal">Uniswap V3 Quoter</h1>
+        <h1 className="mb-3 h3 fw-normal">Uniswap V3 Quoter</h1>
 
-        <div className="btn-group mb-3" role="group">
+        <div className="mb-3 btn-group" role="group">
           <input type="radio" className="btn-check" name="btnradio" id="buy" onChange={()=>setBuyFlag(true)} autoComplete="off" checked={buyFlag} />
           <label className="btn btn-outline-primary" htmlFor="buy">BUY</label>
         
@@ -187,6 +176,15 @@ function App() {
               </>
             }
           </label>
+        </div>
+        <div className="form-floating">
+          <select className="form-select" id="floatingFee" onChange={(e) => setFee(e.target.value)}>
+          <option>Choose...</option>
+          { poolFees.map((fee, idx) => 
+              <option value={fee} key={idx}>{(fee / 10000).toFixed(2) + '%'}</option>
+            )}
+          </select>
+          <label htmlFor="floatingFee">Fee</label>
         </div>
 
         <br />
