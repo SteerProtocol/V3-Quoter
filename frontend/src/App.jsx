@@ -13,31 +13,27 @@ const {
 const tokens = [
   {
     symbol: "WETH",
-    address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    address: "0xd0A1E359811322d97991E03f863a0C30C2cF029C"
   },
   {
     symbol: "DAI",
-    address: "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    address: "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa"
   },
   {
     symbol: "LINK",
-    address: "0x514910771AF9Ca656af840dff83E8264EcF986CA"
+    address: "0xa36085F69e2889c224210F603D836748e7dC0088"
   },
   {
     symbol: "UNI",
     address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"
   },
   {
-    symbol: "CURVE",
-    address: "0xD533a949740bb3306d119CC777fa900bA034cd52"
-  },
-  {
     symbol: "SHIBA INU",
-    address: "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE"
+    address: "0xE9A1Ed75621D9357C753e1436Fe9EB63628bde67"
   },
   {
-    symbol: "BNB",
-    address: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52"
+    symbol: "CURVE",
+    address: "0xB5A0376635F868Ba9a32446735287385acBee51f"
   }
 ];
 
@@ -50,10 +46,9 @@ function App() {
   const [ sourceToken, setSourceToken ] = useState();
   const [ destToken, setDestToken ] = useState();
   const [ fee, setFee ] = useState();
-  //const tokens = useTokenList();
 
   const [ provider, account, loadWeb3Modal, logoutOfWeb3Modal ] = useWeb3Modal();
-  const chainId = 31337;
+  const chainId = 42;
   const config = useContractConfig();
   const providerAndSigner = useUserProviderAndSigner(provider)
   const contracts = useContractLoader(providerAndSigner.signer, config, chainId);
@@ -109,7 +104,7 @@ function App() {
             0
           );
         } else {
-          expectedAmount = await contracts.Quoter.estimateMinSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
+          expectedAmount = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount, fee);
           expectedAmountUniswap = await uniswap.callStatic.quoteExactOutputSingle(
             sourceToken,
             destToken,
