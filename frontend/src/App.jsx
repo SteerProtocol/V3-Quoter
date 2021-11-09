@@ -3,7 +3,6 @@ import { ethers } from 'ethers';
 import { useContractLoader, useUserProviderAndSigner } from "eth-hooks";
 import useWeb3Modal from "./hooks/useWeb3Modal";
 import useContractConfig from "./hooks/useContractConfig";
-import useTokenList from "./hooks/useTokenList";
 import './App.css';
 
 const {
@@ -49,10 +48,10 @@ function App() {
   const providerAndSigner = useUserProviderAndSigner(provider)
   const contracts = useContractLoader(providerAndSigner.signer, config, chainId);
 
-  const poolFees = [500, 3000, 10000];
+  const poolFees = [ 500, 3000, 10000 ];
 
   useEffect(() => {
-    loadWeb3Modal()
+    
   }, []);
 
   const setErrorAlert = (text) => {
@@ -78,11 +77,11 @@ function App() {
 
     setLoading(true);
 
+    loadWeb3Modal();
+
     try {
 
       const exists = await contracts.Quoter.doesPoolExist(sourceToken, destToken);
-
-      console.log("Quoter contract", contracts.Quoter);
       
       if(!exists) {
         setErrorAlert("Pool does not exist");
@@ -94,6 +93,7 @@ function App() {
         let expectedAmountUniswap = 0;
         
         if(!buyFlag) {
+          // Sell
           expectedAmount = await contracts.Quoter.estimateMaxSwapUniswapV3(sourceToken, destToken, formattedAmount, fee);
           expectedAmountUniswap = await uniswap.callStatic.quoteExactInputSingle(
             sourceToken,
@@ -103,6 +103,7 @@ function App() {
             0
           );
         } else {
+          // Buy
           expectedAmount = await contracts.Quoter.estimateMinSwapUniswapV3(destToken, sourceToken, formattedAmount, fee);
           expectedAmountUniswap = await uniswap.callStatic.quoteExactOutputSingle(
             sourceToken,
@@ -139,7 +140,7 @@ function App() {
           <label className="btn btn-outline-primary" htmlFor="sell">SELL</label>
         </div>
         <div className="form-floating">
-          <select className="form-select" id="floatingSourceToken" value={sourceToken} onClick={(e) => e.stopPropagation()} onChange={(e) => setSourceToken(e.target.value)}>
+          <select className="form-select" id="floatingSourceToken" value={sourceToken} onChange={(e) => setSourceToken(e.target.value)}>
             <option>Choose...</option>
             { tokens.filter((token) => token.address !== destToken).map((token, idx) => 
               <option value={token.address} key={idx}>{token.symbol}</option>
@@ -148,9 +149,9 @@ function App() {
           <label htmlFor="floatingSourceToken">Source Token</label>
         </div>
         <div className="form-floating">
-          <select className="form-select" id="floatingDestToken" value={destToken} onClick={(e) => e.stopPropagation()} onChange={(e) => setDestToken(e.target.value)}>
-          <option>Choose...</option>
-          { tokens.filter((token) => token.address !== sourceToken).map((token, idx) => 
+          <select className="form-select" id="floatingDestToken" value={destToken} onChange={(e) => setDestToken(e.target.value)}>
+            <option>Choose...</option>
+            { tokens.filter((token) => token.address !== sourceToken).map((token, idx) => 
               <option value={token.address} key={idx}>{token.symbol}</option>
             )}
           </select>
@@ -197,7 +198,7 @@ function App() {
         { err !== "" &&
           <div className="alert alert-danger text-wrap" role="alert">{err}</div>
         }
-        <p className="mt-5 mb-3 text-muted">Made for Unicode Hack - v1.0.0</p>
+        <p className="mt-5 mb-3 text-muted">Made for Unicode Hack - v1.0.2</p>
       </form>
     </main>
   );

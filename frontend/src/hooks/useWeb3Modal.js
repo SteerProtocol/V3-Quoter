@@ -5,7 +5,7 @@ import Web3Modal from "web3modal";
 
 // Enter a valid infura key here to avoid being rate limited
 // You can get a key for free at https://infura.io/register
-const INFURA_ID = "INVALID_INFURA_KEY";
+const INFURA_ID = "460f40a260564ac4a4f4b3fffb032dad";
 const NETWORK = "kovan";
 
 function useWeb3Modal(config = {}) {
