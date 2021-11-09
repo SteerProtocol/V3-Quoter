@@ -192,7 +192,7 @@ function App() {
         { err !== "" &&
           <div className="alert alert-danger text-wrap" role="alert">{err}</div>
         }
-        <p className="mt-5 mb-3 text-muted">Made for Unicode Hack - v1.0.2</p>
+        <p className="mt-5 mb-3 text-muted">Made for Unicode Hack - v0.0.3</p>
       </form>
     </main>
   );
