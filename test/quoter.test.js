@@ -40,7 +40,7 @@ describe("Quoter comparison test", function () {
         await quoter.deployed();
 
         const uniswap = await ethers.getContractAt(abi, uniswapQuoterAddress);
-        const amount = ethers.utils.parseUnits("1.0", 18);
+        const amount = ethers.utils.parseUnits("100.0", 18);
 
         const expectedAmountToReceive0 =
           await uniswap.callStatic.quoteExactInputSingle(
@@ -51,11 +51,16 @@ describe("Quoter comparison test", function () {
             0
           );
 
+          console.log("Lens result" + fromToken.symbol + " -> " + toToken.symbol, ethers.utils.formatUnits(expectedAmountToReceive0, 18));
+
           const expectedAmountToReceive1 = await quoter.estimateMaxSwapUniswapV3(
             fromToken.address,
             toToken.address,
-            amount
+            amount,
+            3000
           );
+
+          console.log("Quoter result" + fromToken.symbol + " -> " + toToken.symbol, ethers.utils.formatUnits(expectedAmountToReceive1, 18));
       
           const minimum = Math.min(
             expectedAmountToReceive0,
