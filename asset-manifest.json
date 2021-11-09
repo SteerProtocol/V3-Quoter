@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/V3-Quoter/static/css/main.f3094e31.chunk.css",
-    "main.js": "/V3-Quoter/static/js/main.94f371a6.chunk.js",
-    "main.js.map": "/V3-Quoter/static/js/main.94f371a6.chunk.js.map",
+    "main.js": "/V3-Quoter/static/js/main.52f3b000.chunk.js",
+    "main.js.map": "/V3-Quoter/static/js/main.52f3b000.chunk.js.map",
     "runtime-main.js": "/V3-Quoter/static/js/runtime-main.b35eb572.js",
     "runtime-main.js.map": "/V3-Quoter/static/js/runtime-main.b35eb572.js.map",
     "static/js/2.4a424ddf.chunk.js": "/V3-Quoter/static/js/2.4a424ddf.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.b35eb572.js",
     "static/js/2.4a424ddf.chunk.js",
     "static/css/main.f3094e31.chunk.css",
-    "static/js/main.94f371a6.chunk.js"
+    "static/js/main.52f3b000.chunk.js"
   ]
 }
