@@ -25,10 +25,6 @@ const tokens = [
   {
     symbol: "UNI",
     address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"
-  },
-  {
-    symbol: "MKR",
-    address: "0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD"
   }
 ];
 
@@ -51,7 +47,7 @@ function App() {
   const poolFees = [ 500, 3000, 10000 ];
 
   useEffect(() => {
-    
+    loadWeb3Modal();
   }, []);
 
   const setErrorAlert = (text) => {
@@ -76,8 +72,6 @@ function App() {
     }
 
     setLoading(true);
-
-    loadWeb3Modal();
 
     try {
 

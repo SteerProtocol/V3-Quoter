@@ -18,6 +18,11 @@ module.exports = {
     localhost: {
       url: "http://localhost:8545",
     },
+    rinkeby: {
+      url: "https://rinkeby.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : ["0xc81f44d94f88de2bd9ea5199126caa586e50e9be90d09447d089eb90069da01b"],
+      chainId: 4
+    },
     kovan: {
       url: "https://kovan.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : ["0xc81f44d94f88de2bd9ea5199126caa586e50e9be90d09447d089eb90069da01b"],
