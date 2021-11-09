@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "private": false,
-  "license": "BUSL-1.1",
+  "license": "MIT",
   "homepage": "https://sandrones-team.github.io/V3-Quoter",
   "dependencies": {
     "@ethersproject/providers": "^5.5.0",
