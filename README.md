@@ -20,3 +20,28 @@ Here is how the algorithm works on a general level:
 3. Calculate how much you can swap within the tick, subtract the (calculated) swapped liquidity from the total amount and move to the next tick
 
 4. Rinse and repeat until no liquidity is left
+
+## How to use it
+
+1. Clone the repo
+   ```sh
+   git clone ...this repo...
+   ```
+2. Install required packages both in the base and the *frontend* folder using the same command
+   ```sh
+   yarn install
+   ```
+3. Run a mainnet fork and deploy the smart contract
+   ```sh
+   yarn fork
+   ```
+4. Execute the demo frontend app
+   ```sh
+   cd frontend
+   yarn start
+   ```
+5. Connect with *MetaMask* browser wallet using the following network settings
+   ```
+   Chain ID: 31337
+   RPC URL: http://127.0.0.1:8545
+   ```

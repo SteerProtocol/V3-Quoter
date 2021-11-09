@@ -48,6 +48,10 @@ function App() {
 
   useEffect(() => {
     loadWeb3Modal();
+
+    return () => {
+      logoutOfWeb3Modal();
+    }
   }, []);
 
   const setErrorAlert = (text) => {
@@ -113,7 +117,8 @@ function App() {
       }
 
     } catch(e) {
-      console.log(e);
+      console.error("Error occurred");
+      console.error(e);
       setErrorAlert("MetaMask Provider Error");
     }
 

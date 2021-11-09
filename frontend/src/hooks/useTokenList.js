@@ -37,7 +37,8 @@ const useTokenList = (tokenListUri, chainId) => {
 
           setTokenList(_tokenList.tokens);
         } catch (e) {
-          console.log(e);
+          console.error("Error occurred");
+          console.error(e);
         }
     };
     getTokenList();
