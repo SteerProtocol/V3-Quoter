@@ -54,7 +54,8 @@ describe("Quoter comparison test", function () {
           const expectedAmountToReceive1 = await quoter.estimateMaxSwapUniswapV3(
             fromToken.address,
             toToken.address,
-            amount
+            amount,
+            3000
           );
       
           const minimum = Math.min(
