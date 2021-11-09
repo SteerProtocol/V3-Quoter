@@ -12,6 +12,7 @@ import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "./interfaces/IQuoter.sol";
 import "./interfaces/IUniswapV3Quoter.sol";
 import "./libraries/FullMath.sol";
+import "./libraries/TickMath.sol";
 import "./libraries/SafeCast.sol";
 import "./libraries/TickBitmap.sol";
 import "./libraries/SqrtPriceMath.sol";
@@ -57,9 +58,8 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         address _pool
     ) internal view returns (uint256 amountOut) {
         bool zeroForOne = _fromToken > _toToken;
-        (uint160 sqrtPriceX96,,,,,,) = IUniswapV3Pool(_pool).slot0();
         // todo: price limit?
-        (int256 amount0, int256 amount1) = quoteSwapExactAmount(_pool, int256(_amount), zeroForOne ? sqrtPriceX96 * 5 / 10 : sqrtPriceX96 * 11 / 10, zeroForOne);
+        (int256 amount0, int256 amount1) = quoteSwapExactAmount(_pool, int256(_amount), zeroForOne ? (TickMath.MIN_SQRT_RATIO + 1) : (TickMath.MAX_SQRT_RATIO - 1), zeroForOne);
         if (zeroForOne)
             amountOut = amount1 > 0 ? uint256(amount1) : uint256(-amount1);
         else amountOut = amount0 > 0 ? uint256(amount0) : uint256(-amount0);
@@ -72,9 +72,8 @@ contract Quoter is IQuoter, UniswapV3Quoter {
         address _pool
     ) internal view returns (uint256 amountOut) {
         bool zeroForOne = _fromToken < _toToken;
-        (uint160 sqrtPriceX96,,,,,,) = IUniswapV3Pool(_pool).slot0();
         // todo: price limit?
-        (int256 amount0, int256 amount1) = quoteSwap(_pool, -int256(_amount), zeroForOne ? sqrtPriceX96 * 5 / 10 : sqrtPriceX96 * 11 / 10, zeroForOne);
+        (int256 amount0, int256 amount1) = quoteSwap(_pool, -int256(_amount), zeroForOne ? (TickMath.MIN_SQRT_RATIO + 1) : (TickMath.MAX_SQRT_RATIO - 1), zeroForOne);
         if (zeroForOne)
             amountOut = amount0 > 0 ? uint256(amount0) : uint256(-amount0);
         else amountOut = amount1 > 0 ? uint256(amount1) : uint256(-amount1);
